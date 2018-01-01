@@ -29,7 +29,7 @@ namespace Minesweeper_Game
         public MainGame()
         {
             var normalColour = Color.FromArgb(211, 211, 211);
-            var bombColour = Color.Black; //Color.FromArgb(212, 211, 211);
+            var bombColour = Color.FromArgb(212, 211, 211);
                                           //Loop used to create the new instances of the textbox
             for (int i = 0; i < textTime.Length; i++)
             {
@@ -143,7 +143,7 @@ namespace Minesweeper_Game
         private void ButtonClick(object sender, EventArgs e)
         {
             var normalColour = Color.FromArgb(211, 211, 211);
-            var bombColour = Color.Black; //Color.FromArgb(212, 211, 211);
+            var bombColour = Color.FromArgb(212, 211, 211);
             var clicked = Color.White;
             var user = ((Button)sender);
             int horizontal = int.Parse(user.Name.Split()[0]);
@@ -162,14 +162,60 @@ namespace Minesweeper_Game
                 }
             }
             //If the square clicked is a mine and has no flag
+            else if (user.BackColor.Equals(bombColour) && user.Tag.ToString() == "No-Flag")
+            {
+                //Play explosion sound effect
+               //////////// explosion.Play();
+                //Look for all mines in the grid and display them with a white background
+                for (x = 0; x < grid.GetLength(0); x++)
+                {
+                    for (y = 0; y < grid.GetLength(1); y++)
+                    {
+                        //If the grid position is a bomb
+                        if (grid[x, y].BackColor.Equals(bombColour))
+                        {
+                            //Show the mine, set the background as white and stop the clock
+                            grid[x, y].BackColor = clicked;
+                            ///////////////grid[x, y].Image = mine;
+                            clock.Stop();
+                            clock.Tick -= (ClockTick);
+                        }
+                    }
+                }
+                //Prompt user if they would like to try again
+                DialogResult gameOverAnswer = MessageBox.Show("Game Over. Would you like to try again?", "Game Over", MessageBoxButtons.YesNo);
+                //If the player would like to play again
+                if (gameOverAnswer == DialogResult.Yes)
+                {
+                    //Reset clock 
+                    playerTime = 0;
+                    //Create new instance of form2 to take user back to difficulty setting
+                    Difficulty form2 = new Difficulty();
+                    Hide();
+                    form2.Show();
+                }
+                else
+                {
+                    //Close program
+                    Close();
+                }
+            }
+            //If the square has no flag 
+            if (user.Tag.ToString() == "No-Flag")
+            {
+                //Call mineCheck to detect how many mines are around
+                MineCheck(sender, horizontal, vertical);
+            }
 
+            //Call imageCheck to set image to the amount of mines around the clicked button
+            ImageCheck(sender, horizontal, vertical);
         }
 
         private void RightClickGrid(object sender, MouseEventArgs e)
         {
             var flagMarker = Properties.Resources.flagMarker;
             var clicked = Color.White;
-            var bombColour = Color.Black;
+            var bombColour = Color.FromArgb(212, 211, 211);
             var user = ((Button)sender);
             int horizontal = int.Parse(user.Name.Split()[0]);
             int vertical = int.Parse(user.Name.Split()[1]);
@@ -242,7 +288,7 @@ namespace Minesweeper_Game
             }
 
             //Call imageCheck to set image to the amount of mines around the clicked button
-            ImageCheck(sender, horizontal, vertical);
+           // ImageCheck(sender, horizontal, vertical);
 
         }
 
